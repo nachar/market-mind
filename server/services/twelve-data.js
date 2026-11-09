@@ -8,3 +8,15 @@ export const getMarketOverview = ({ twelveDataApiKey, symbol }) => {
     }
   })
 };
+
+export const getAssetHistory = ({ twelveDataApiKey, symbol, params }) => {
+  return $fetch(`${BASE_URL}/time_series`, {
+    query: {
+      symbol,
+      apikey: twelveDataApiKey,
+      ...params
+      // interval: '1day' || '5min',
+      // outputsize: 365 || 78,
+    }
+  })
+}

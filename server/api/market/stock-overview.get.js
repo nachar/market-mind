@@ -21,6 +21,7 @@ const STOCK_SYMBOLS_GROUP_2 = [
   'TEAM',    // Atlassian (NASDAQ)
 ]
 
+// TODO: mejor hagamos que reciba estos parámetros por URL o incluso otra opción.
 export default defineEventHandler(async (event) => {
   const { twelveDataApiKey } = useRuntimeConfig(event);
 

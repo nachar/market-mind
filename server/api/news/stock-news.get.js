@@ -1,6 +1,6 @@
 import { getStockNews } from '../../services/finnhub.js'
+import { saveStockNews } from '../../services/stock-news.js'
 
-// Example http://localhost:3000/api/news/stock-news?symbol=AAPL&from=2026-11-08&to=2026-11-09
 export default defineEventHandler(async (event) => {
   const { finnhubApiKey } = useRuntimeConfig(event)
   const { symbol, from, to } = getQuery(event)
@@ -13,14 +13,39 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await getStockNews({
+    const news = await getStockNews({
       finnhubApiKey,
       symbol,
       from,
       to
     })
+
+    if (!Array.isArray(news)) {
+      throw new Error('Invalid response from Finnhub')
+    }
+
+    const saved = await saveStockNews({
+      symbol: symbol.toUpperCase(),
+      from,
+      to,
+      news
+    })
+
+    return {
+      success: true,
+      symbol: symbol.toUpperCase(),
+      from,
+      to,
+      received: news.length,
+      saved
+    }
   } catch (error) {
-    console.error('Finnhub error:', error.data || error.message)
-    throw error
+    console.error('Stock news error:', error.data || error.message)
+
+    throw createError({
+      statusCode: 502,
+      statusMessage: 'Unable to retrieve or save stock news',
+      cause: error
+    })
   }
 })
